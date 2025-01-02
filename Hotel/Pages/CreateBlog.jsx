@@ -26,7 +26,7 @@ export function CreateBlog() {
             // setPosts (filteredKamar)
         }
         loadUserData()
-        
+
     }, []);
 
     const [rooms, setRooms] = useState([]);
@@ -56,7 +56,7 @@ export function CreateBlog() {
                 formattedDate >= act.checkin &&
                 formattedDate <= act.checkout
         );
-        
+
     };
 
     const getDisabledDatesForRoom = (roomNumber) => {
@@ -67,15 +67,28 @@ export function CreateBlog() {
             let currentDate = new Date(act.checkin);
             const endDate = new Date(act.checkout);
 
-            // Tambahkan semua tanggal dalam rentang checkin dan checkout
             while (currentDate <= endDate) {
                 disabledDates.push(new Date(currentDate));
                 currentDate.setDate(currentDate.getDate() + 1);
             }
         });
-
-        return disabledDates; // Daftar tanggal yang tidak dapat dipilih
+        return disabledDates;
     };
+
+    useEffect(() => {
+        async function loadActiveRooms() {
+            let data = await getActives();
+            if (data) {
+                data.forEach((active) => {
+                    active.checkin = new Date(active.checkin).toISOString().split("T")[0];
+                    active.checkout = new Date(active.checkout).toISOString().split("T")[0];
+                });
+                setActive(data);
+            }
+        }
+        loadActiveRooms();
+    }, []);
+
 
 
     useEffect(() => {
@@ -97,26 +110,120 @@ export function CreateBlog() {
         async function loadActiveRooms() {
             let data = await getActives();
             if (data) {
-                data.forEach((active) => {
-                    active.checkin = normalizeDate(active.checkin).toISOString().split("T")[0];
-                    active.checkout = normalizeDate(active.checkout).toISOString().split("T")[0];
-                });
-                console.log("Active data:", data); // Debugging
-                setActive(data);
+                const normalizedData = data.map((active) => ({
+                    ...active,
+                    checkin: normalizeDate(active.checkin),
+                    checkout: normalizeDate(active.checkout),
+                }));
+                setActive(normalizedData);
             }
         }
         loadActiveRooms();
     }, []);
 
+    const isSpinnerDisabled = (nomorKamar) => {
+        // Cari roomId berdasarkan NomorKamar
+        const room = rooms.find((room) => room.NomorKamar === parseInt(nomorKamar, 10));
+        if (!room) return false; // Jika room tidak ditemukan, spinner tetap aktif
 
-    const handleSpinnerChange = (roomNumber, value) => {
-        if (!dates[roomNumber]) return;
+        const roomId = room.roomId; // Ambil roomId yang sesuai
+        const checkInDate = dates[nomorKamar];
+        if (!checkInDate) return false; // Jika tidak ada tanggal check-in, spinner tetap aktif
 
+        const spinnerDays = spinners[nomorKamar] || 1; // Default 1 hari jika spinner belum diatur
+        const newCheckoutDate = calculateCheckoutDate(checkInDate, spinnerDays);
+
+        // Validasi apakah tanggal checkout bertabrakan
+        const checkoutDateObj = new Date(newCheckoutDate);
+        const disabledDates = getDisabledDatesForRoom(roomId);
+
+        // Periksa apakah tanggal checkout ada di dalam daftar tanggal yang dikecualikan
+        return disabledDates.some(
+            (disabledDate) =>
+                disabledDate.toISOString().split("T")[0] === checkoutDateObj.toISOString().split("T")[0]
+        );
+    };
+
+    const getMaxSpinner = (nomorKamar) => {
+        const room = rooms.find((room) => room.NomorKamar === parseInt(nomorKamar, 10));
+        if (!room) return Infinity;
+
+        const roomId = room.NomorKamar;
+        const checkInDate = dates[nomorKamar];
+        if (!checkInDate) return Infinity;
+
+        const roomActiveDates = active
+            .filter((act) => act.roomId === roomId)
+            .map((act) => ({
+                start: new Date(act.checkin),
+                end: new Date(act.checkout),
+
+            }));
+
+
+        roomActiveDates.sort((a, b) => a.start - b.start);
+
+        let maxSpinner = Infinity;
+        const checkInDateObj = new Date(checkInDate);
+
+        for (const { start } of roomActiveDates) {
+            if (start > checkInDateObj) {
+                maxSpinner = Math.floor((start - checkInDateObj) / (1000 * 60 * 60 * 24));
+                break;
+            }
+        }
+        console.log(maxSpinner)
+        return maxSpinner;
+
+    };
+
+    const handleSpinnerChange = (nomorKamar, value) => {
+        // Cari roomId berdasarkan nomor kamar
+        const room = rooms.find((room) => room.NomorKamar === parseInt(nomorKamar, 10));
+        if (!room) {
+            alert("Room not found!");
+            return;
+        }
+
+        const roomId = room.roomId; // Dapatkan roomId
+        const checkInDate = dates[nomorKamar];
+        if (!checkInDate) {
+            alert("Please select a check-in date first.");
+            return;
+        }
+
+        // Hitung tanggal checkout baru berdasarkan spinner value
+        const newCheckoutDate = calculateCheckoutDate(checkInDate, value);
+        const checkoutDateObj = new Date(newCheckoutDate);
+
+        // Filter active data untuk roomId yang sesuai
+        const roomActiveDates = active
+            .filter((act) => act.roomId === roomId)
+            .map((act) => ({
+                start: new Date(act.checkin),
+                end: new Date(act.checkout),
+            }));
+
+        // Periksa apakah tanggal checkout bertabrakan
+        const isConflict = roomActiveDates.some(({ start, end }) =>
+            checkoutDateObj >= start && checkoutDateObj <= end
+        );
+
+        if (isConflict) {
+            alert(`Tanggal checkout ${newCheckoutDate} bertabrakan dengan reservasi lain. Tidak dapat menambahkan durasi.`);
+            return;
+        }
+
+        // Perbarui spinner jika valid
         setSpinners((prevSpinners) => ({
             ...prevSpinners,
-            [roomNumber]: value,
+            [nomorKamar]: value,
         }));
+
+        console.log(`Spinner untuk kamar ${nomorKamar} diperbarui ke: ${value}`);
     };
+
+
 
     const calculateCheckoutDate = (checkInDate, daysToAdd) => {
         const date = new Date(checkInDate); // Buat salinan tanggal
@@ -127,17 +234,12 @@ export function CreateBlog() {
 
     const handleCheckboxChange = (event) => {
         const { value, checked } = event.target;
-
-        console.log("Checkbox value:", value, "Checked:", checked);
+        const intValue = parseInt(value, 10); // Konversi ke integer
 
         if (checked) {
             if (!selectedRooms.includes(value)) {
                 const defaultDate = getDefaultDate(value);
                 setSelectedRooms((prevSelected) => [...prevSelected, value]);
-                setSpinners((prevSpinners) => ({
-                    ...prevSpinners,
-                    [value]: 1,
-                }));
                 setDates((prevDates) => ({
                     ...prevDates,
                     [value]: defaultDate.toISOString().split("T")[0],
@@ -147,11 +249,6 @@ export function CreateBlog() {
             setSelectedRooms((prevSelected) =>
                 prevSelected.filter((roomNumber) => roomNumber !== value)
             );
-            setSpinners((prevSpinners) => {
-                const newSpinners = { ...prevSpinners };
-                delete newSpinners[value];
-                return newSpinners;
-            });
             setDates((prevDates) => {
                 const newDates = { ...prevDates };
                 delete newDates[value];
@@ -159,6 +256,7 @@ export function CreateBlog() {
             });
         }
     };
+
 
 
 
@@ -208,12 +306,10 @@ export function CreateBlog() {
 
     const submitReservation = async () => {
         if (!decodedUser?._id) {
-            console.log("User tidak valid!");
             return;
         }
 
         if (selectedRooms.length === 0) {
-            console.log("Tidak ada kamar yang dipilih untuk reservasi!");
             return;
         }
 
@@ -224,17 +320,14 @@ export function CreateBlog() {
 
             const newActiveHotel = {
                 userId: decodedUser._id,
-                roomId: roomNumber,
-                checkin: checkInDate, // Gunakan tanggal check-in dari state
+                roomId: parseInt(roomNumber, 10), // Konversi ke integer
+                checkin: checkInDate,
                 checkout: checkOutDate,
             };
 
             try {
-                console.log("Membuat entri baru untuk ActiveHotel:", newActiveHotel);
                 await NewActive(newActiveHotel);
-                console.log(`Reservasi untuk kamar ${roomNumber} berhasil dibuat.`);
             } catch (error) {
-                console.error(`Gagal membuat reservasi untuk kamar ${roomNumber}:`, error);
             }
         }
 
@@ -243,6 +336,7 @@ export function CreateBlog() {
         setDates({}); // Reset tanggal
         setSpinners({}); // Reset spinner
     };
+
 
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -266,47 +360,101 @@ export function CreateBlog() {
         setreserve(false)
     }
 
-    const handleDateChange = (roomNumber, date) => {
+    const handleDateChange = (nomorKamar, date) => {
         if (!date) return;
-
-        const formattedDate = date.toISOString().split("T")[0]; // Format menjadi YYYY-MM-DD
-
-        // Validasi apakah tanggal termasuk dalam tanggal yang dinonaktifkan
-        if (isDateDisabledForActive(roomNumber, date)) {
+    
+        const room = rooms.find((room) => room.NomorKamar === parseInt(nomorKamar, 10));
+        if (!room) {
+            alert("Room not found!");
+            return;
+        }
+    
+        const roomId = room.roomId; // Dapatkan roomId
+        const formattedDate = date.toISOString().split("T")[0];
+    
+        // Filter active data berdasarkan roomId
+        const roomActiveDates = active
+            .filter((act) => act.roomId === roomId)
+            .map((act) => ({
+                start: new Date(act.checkin),
+                end: new Date(act.checkout),
+            }));
+    
+        // Validasi apakah tanggal check-in bertabrakan
+        const isConflict = roomActiveDates.some(({ start, end }) =>
+            date >= start && date <= end
+        );
+    
+        if (isConflict) {
             alert("Tanggal yang dipilih sudah dipesan. Silakan pilih tanggal lain.");
             return;
         }
-
-        // Perbarui tanggal check-in di state dates
+    
         setDates((prevDates) => ({
             ...prevDates,
-            [roomNumber]: formattedDate, // Tetapkan tanggal check-in untuk kamar tertentu
+            [nomorKamar]: formattedDate,
         }));
-
+    
         // Reset spinner ke 1 untuk kamar tersebut
         setSpinners((prevSpinners) => ({
             ...prevSpinners,
-            [roomNumber]: 1,
+            [nomorKamar]: 1,
         }));
+    
+        console.log(`Tanggal untuk kamar ${nomorKamar} diubah ke: ${formattedDate}`);
     };
+    
 
 
-    const getDefaultDate = (roomNumber) => {
-        const today = new Date();
-        let nextValidDate = new Date(today);
-
-        // Cek apakah hari ini dinonaktifkan
-        while (isDateDisabledForActive(roomNumber, nextValidDate)) {
-            nextValidDate.setDate(nextValidDate.getDate() + 1); // Cari tanggal berikutnya
+    const getDefaultDate = (nomorKamar) => {
+        const room = rooms.find((room) => room.NomorKamar === parseInt(nomorKamar, 10));
+        if (!room) {
+            console.error("Room not found!");
+            return new Date(); // Default ke hari ini jika room tidak ditemukan
         }
 
+        const roomId = room.roomId; // Dapatkan roomId
+        let today = new Date();
+        let nextValidDate = new Date(today);
+
+        // Ambil daftar tanggal yang dikecualikan berdasarkan roomId
+        const excludedDates = active
+            .filter((act) => act.roomId === roomId)
+            .flatMap((act) => {
+                let currentDate = new Date(act.checkin);
+                const endDate = new Date(act.checkout);
+                const dates = [];
+                while (currentDate <= endDate) {
+                    dates.push(new Date(currentDate));
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+                return dates;
+            });
+
+        // Cari tanggal valid berikutnya
+        while (
+            excludedDates.some(
+                (excludedDate) =>
+                    excludedDate.toISOString().split("T")[0] ===
+                    nextValidDate.toISOString().split("T")[0]
+            )
+        ) {
+            nextValidDate.setDate(nextValidDate.getDate() + 1);
+        }
+
+        console.log(`Default date for room ${nomorKamar}: ${nextValidDate.toISOString().split("T")[0]}`);
         return nextValidDate;
     };
+
+
+
+
 
     const normalizeDate = (dateString) => {
         const date = new Date(dateString);
         return new Date(date.getFullYear(), date.getMonth(), date.getDate()); // Set waktu ke 00:00:00
     };
+
 
 
 
@@ -366,8 +514,9 @@ export function CreateBlog() {
                                     ))}
                                 </div>
                             </div>
-                            <div>
+                            <div className='Formreservasi'>
                                 {/* //Logikaa */}
+                                <h1>Kamar</h1>
                                 {rooms.map((room) => (
                                     <div key={room?.NomorKamar} className={`kamar-${room?.NomorKamar}`}>
                                         <label>
@@ -386,8 +535,10 @@ export function CreateBlog() {
                                                             ? new Date(dates[room?.NomorKamar])
                                                             : getDefaultDate(room?.NomorKamar)
                                                     }
+                                                    // selected={getDefaultDate(room?.NomorKamar)}
                                                     minDate={new Date()}
-                                                    excludeDates={getDisabledDatesForRoom(room?.NomorKamar)} // Masukkan daftar tanggal yang tidak dapat dipilih
+                                                    excludeDates={getDisabledDatesForRoom(room?.NomorKamar)}
+
                                                     onChange={(date) => handleDateChange(room?.NomorKamar, date)}
                                                 />
 
@@ -395,6 +546,7 @@ export function CreateBlog() {
                                                     type="number"
                                                     value={spinners[room?.NomorKamar] || 1}
                                                     min={1}
+                                                    max={getMaxSpinner(room?.NomorKamar)} // Atur batas maksimal spinner
                                                     onChange={(e) =>
                                                         handleSpinnerChange(
                                                             room?.NomorKamar,
@@ -402,6 +554,7 @@ export function CreateBlog() {
                                                         )
                                                     }
                                                 />
+
                                                 <p>
                                                     Checkout:{" "}
                                                     {dates[room?.NomorKamar]
@@ -415,15 +568,12 @@ export function CreateBlog() {
                                         )}
                                     </div>
                                 ))}
-
-
-
-
                                 {/* Logika */}
+                                <button onClick={submitReservation}>Submit</button>
                             </div>
 
                             <div></div>
-                            <button onClick={submitReservation}>Submit</button>
+                           
                         </form>
 
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" id="back" onClick={reservasi} className="outlogin">

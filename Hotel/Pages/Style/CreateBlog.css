@@ -166,3 +166,19 @@
 .indicator:hover {
     background-color: rgba(255, 255, 255, 0.8);
 }
+
+.Submit-Reservasi{
+    display: flex;
+    color: #2f2a29;
+    font-weight: 500;
+}
+
+
+.formreservasi div{
+    
+}
+/* .kamar-1{
+    left: 20px;
+    position: absolute
+    
+} */
