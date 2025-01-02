@@ -1,0 +1,168 @@
+.KotakLogin {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    /* Efek blur */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 25;
+}
+
+.IsiKotakLogin {
+    position: fixed;
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+
+    text-align: center;
+    z-index: 25;
+    background-color: rgb(230, 215, 213, 0.5);
+}
+
+.outlogin {
+    position: absolute;
+    background: transparent;
+    top: 5%;
+    left: 5%;
+    width: 30px;
+    border-radius: 6px;
+    text-align: center;
+    z-index: 26;
+    cursor: pointer;
+    font-size: large;
+    font-weight: 900;
+}
+
+
+.carousel::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Lapisan gelap */
+    z-index: 2; /* Pastikan overlay berada di atas gambar */
+    pointer-events: none; /* Agar overlay tidak mengganggu interaksi */
+}
+
+.carousel {
+    position: relative;
+    max-width: 600px;
+    margin: auto;
+    overflow: hidden;
+    border-radius: 30%;
+    border: 5px solid #2f2a29;
+    display: flex;
+
+}
+
+.carousel-container {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slide {
+    position: relative; /* Parent untuk posisi checkbox */
+    min-width: 100%;
+    height: 100%;
+}
+
+
+.carousel-slide label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+    z-index: 19;
+    position: absolute;
+    width: 300px;
+}
+
+.checkbox-container input[type="checkbox"] {
+    accent-color: #ff5733; /* Warna centang */
+    transform: scale(1.2); /* Perbesar ukuran checkbox */
+    cursor: pointer;
+    z-index: 4; /* Pastikan di atas gambar */
+}
+
+
+.checkbox-container {
+    position: absolute; /* Checkbox di atas gambar */
+    top: 10px; /* Atur jarak dari atas */
+    left: 10px; /* Atur jarak dari kiri */
+    z-index: 3; /* Pastikan berada di atas gambar */
+    display: flex; /* Jika ada beberapa checkbox */
+    flex-direction: column; /* Susun checkbox secara vertikal */
+    gap: 10px; /* Jarak antar checkbox */
+}
+
+
+
+.carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 2;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 2;
+    border-radius: 50%;
+    font-size: 18px;
+    user-select: none;
+}
+
+.carousel-btn.prev {
+    left: 10px;
+}
+
+.carousel-btn.next {
+    right: 10px;
+}
+
+.carousel-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.carousel-indicators {
+    position: absolute;
+    bottom: 10px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    gap: 8px;
+}
+
+.indicator {
+    width: 10px;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.indicator.active {
+    background-color: white;
+}
+
+.indicator:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+}

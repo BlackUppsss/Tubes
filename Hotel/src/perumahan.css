@@ -1,0 +1,180 @@
+.santahat {
+    width: 80px;
+    height: auto;
+    top: 2px;
+    right: -23px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 15;
+    transform: rotate(20deg);
+}
+
+.trees {
+    width: 200px;
+    height: auto;
+    top: 70px;
+    left: 150px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+}
+
+.trees1 {
+    width: 200px;
+    height: auto;
+    top: 70px;
+    left: 300px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+}
+
+.trees2 {
+    width: 200px;
+    height: auto;
+    top: 72px;
+    left: 550px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+}
+
+.trees3 {
+    width: 200px;
+    height: auto;
+    top: 75px;
+    left: 560px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+    transform: scaleX(-1);
+}
+
+.trees4 {
+    width: 200px;
+    height: auto;
+    top: 70px;
+    left: 1000px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+    transform: scaleX(-1);
+}
+
+.trees5 {
+    width: 200px;
+    height: auto;
+    top: 73px;
+    left: 1200px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+}
+
+.house {
+    width: 300px;
+    height: auto;
+    top: 36px;
+    left: 650px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+}
+
+.house2 {
+    width: 300px;
+    height: auto;
+    top: 35px;
+    left: 890px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+    transform: scaleX(-1);
+}
+
+.sleid {
+    width: 300px;
+    height: auto;
+    top: 20px;
+    left: 750px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+    transform: scaleX(-1);
+}
+
+.houses {
+    width: 400px;
+    height: auto;
+    top: -2px;
+    left: 320px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+    transform: scaleX(-1);
+}
+
+.hill {
+    width: 400px;
+    height: auto;
+    top: -0px;
+    left: 1220px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+}
+
+.ntl {
+    width: 400px;
+    height: auto;
+    top: 25px;
+    left: 1100px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+}
+
+.ntl1 {
+    width: 400px;
+    height: auto;
+    top: 25px;
+    left: 720px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+}
+
+.ntl2 {
+    width: 400px;
+    height: auto;
+    top: 25px;
+    left: 340px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+}
+
+.ntl3 {
+    width: 400px;
+    height: auto;
+    top: 25px;
+    left: 100px;
+    position: fixed;
+    margin-right: 25px;
+    z-index: 11;
+    pointer-events: none;
+}
