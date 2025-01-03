@@ -9,7 +9,7 @@ import Houses from '../src/assets/Video/Perumahan.png'
 import Gunduk from '../src/assets/Video/Gundukan.png'
 import TaliNatal from '../src/assets/Video/TaliNatal.png'
 import { useState, useEffect } from "react"
-import { getPosts, createUsers, getUsers, updateUsers, updatePost, deleteUsers, VerifyUser } from '../src/api'
+import { getPosts, createUsers, getUsers, updateUsers, updatePost, deleteUsers, VerifyUser, getActive, getActives,deleteActive } from '../src/api'
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import * as jwt_decode from "jwt-decode";
@@ -20,10 +20,13 @@ import '../src/scss/styles.scss'
 // import { post } from "../../jamal/userRoutes"
 
 export function Navbar() {
+    
     const [users, setUsers] = useState();
     // const [posts, setPosts] = useState();
     const [bleh, ableh] = useState(true);
+    const [active, setActive] = useState([]);
     const token = sessionStorage.getItem("User")
+    
     let decodedUser
     try {
         decodedUser = jwt_decode.jwtDecode(token)
@@ -50,6 +53,18 @@ export function Navbar() {
         loadUserData()
     }, []);
 
+    useEffect(() => {
+        async function getAalctive() {
+            let data = await getActives()
+            console.log("Active Data:", data);
+            if (data) {
+                setActive(data)
+            }
+        }
+
+        getAalctive()
+    }, []);
+
     const Navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false);
     const closeBox = () => {
@@ -64,7 +79,7 @@ export function Navbar() {
 
     const [profil, setprofil] = useState(false)
     const closeprofil = () => {
-        setisreg(false)
+        setprofil(false)
 
     }
 
@@ -136,7 +151,7 @@ export function Navbar() {
         window.location.reload()
     }
 
-
+    const userActiveRooms = active.filter(item => item.userId === decodedUser?._id);
     return (
         <div className="navfull">
             <div>
@@ -343,7 +358,17 @@ export function Navbar() {
                 <div className="KotakLogin">
 
                     <div className="IsiKotakLogin">
-                        
+                        {userActiveRooms.length > 0 ? (
+                            userActiveRooms.map((item, index) => (
+                                <div key={index}>
+                                    <h2>Nomor Kamar: {item.roomId}</h2>
+                                    <h2>Check in: {item.checkin}</h2>
+                                    <h2>Check out: {item.checkout}</h2>
+                                </div>
+                            ))
+                        ) : (
+                            <h2>Belum ada kamar aktif untuk pengguna ini.</h2>
+                        )}
                         <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 128 128" viewBox="0 0 128 128" id="back" onClick={closeprofil} className="outlogin">
                             <path fill="#373737" d="M126.2,68.5c-0.2-4.4-1.2-8.8-2.8-12.9c-1.6-4.1-4-8-6.9-11.4c-1.5-1.7-3-3.3-4.8-4.7c-0.4-0.4-0.9-0.7-1.3-1.1
 	                                c-0.4-0.3-0.9-0.7-1.4-1l-1.4-0.9c-0.5-0.3-1-0.6-1.4-0.9c-1.9-1.1-4-2.1-6.1-3c-2.1-0.8-4.3-1.5-6.5-1.9c-2.2-0.5-4.5-0.8-6.8-0.8

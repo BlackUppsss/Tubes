@@ -9,8 +9,8 @@ export const pageData = [
         path: "/services"
     },
     {
-        name: "Profile ",
-        path: "/profile"
+        name: "Restaurant ",
+        path: "/restaurant"
     },
     {
         name: "Contact",

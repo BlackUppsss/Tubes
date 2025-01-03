@@ -57,8 +57,6 @@ function App() {
   
   }, []);
   
-
-
   //http://localhost:5173/Landing
   return (
     <Router>
@@ -69,7 +67,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/services" element={<CreateBlog />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/restaurant" element={<Profile />} />
         <Route path="/readblog" element={<ReadBlog />} />
         </Route>
       </Routes>

@@ -1,4 +1,4 @@
-import { getPosts, getPost, createPost, updatePost, deletePost, getActive, getActives, UpdateActive, deleteActive, NewActive } from '../src/api'
+import { getPosts, getPost, createPost, updatePost, deletePost, getActive, getActives, UpdateActive, deleteActive, NewActive, deleteUsers } from '../src/api'
 import { useEffect, useState } from 'react'
 import './Style/CreateBlog.css'
 import Hotel1 from '../src/assets/Video/Hotel1.jpg'
@@ -6,8 +6,37 @@ import Hotel2 from '../src/assets/Video/Hotel2.jpg'
 import * as jwt_decode from "jwt-decode";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import class1 from '../src/assets/Video/Class1.jpg'
+import class2 from '../src/assets/Video/Class2.jpg'
+import class3 from '../src/assets/Video/Class3.jpg'
+import class4 from '../src/assets/Video/Class4.jpg'
 
 export function CreateBlog() {
+    const [rooms, setRooms] = useState([]);
+    const token = sessionStorage.getItem("User")
+    const [spinners, setSpinners] = useState({});
+    const [selectedRooms, setSelectedRooms] = useState([]);
+    const [dates, setDates] = useState({
+        checkin: {},
+        checkout: {},
+    });
+    const [reserve, setreserve] = useState(false)
+    const reservasi = () => {
+        setreserve(false)
+    }
+    const [active, setActive] = useState([]);
+    const [disabledDates, setDisabledDates] = useState(new Set());
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const slides = [
+        Hotel1,
+        Hotel2,
+    ];
+    let decodedUser
+    try {
+        decodedUser = jwt_decode.jwtDecode(token)
+    } catch (error) {
+
+    }
 
     useEffect(() => {
         async function loadUserData() {
@@ -21,32 +50,56 @@ export function CreateBlog() {
             } catch (error) {
 
             }
-            // const KamarHotel = await getPosts()
-            // const filteredKamar = KamarHotel.filter((kamar) => post.author == decodeUser._id)
-            // setPosts (filteredKamar)
         }
         loadUserData()
 
     }, []);
 
-    const [rooms, setRooms] = useState([]);
-    const token = sessionStorage.getItem("User")
-    const [spinners, setSpinners] = useState({});
-    const [selectedRooms, setSelectedRooms] = useState([]);
-    const [dates, setDates] = useState({
-        checkin: {},
-        checkout: {},
-    });
-    const [active, setActive] = useState([]);
-    const [disabledDates, setDisabledDates] = useState(new Set());
-    let decodedUser
-    try {
-        decodedUser = jwt_decode.jwtDecode(token)
-    } catch (error) {
+    useEffect(() => {
+        async function loadActiveRooms() {
+            let data = await getActives();
+            if (data) {
+                data.forEach((active) => {
+                    active.checkin = new Date(active.checkin).toISOString().split("T")[0];
+                    active.checkout = new Date(active.checkout).toISOString().split("T")[0];
+                });
+                setActive(data);
+            }
+        }
+        loadActiveRooms();
+    }, []);
 
-    }
+    useEffect(() => {
+        async function loadKamar() {
+            let data = await getPosts();
+            if (data) {
+                data.forEach((room) => {
+                    room.Checkin = normalizeDate(room.Checkin);
+                    room.Checkout = normalizeDate(room.Checkout);
+                });
+                setRooms(data);
+            }
+        }
+        loadKamar();
+    }, []);
+
+    useEffect(() => {
+        async function loadActiveRooms() {
+            let data = await getActives();
+            if (data) {
+                const normalizedData = data.map((active) => ({
+                    ...active,
+                    checkin: normalizeDate(active.checkin),
+                    checkout: normalizeDate(active.checkout),
+                }));
+                setActive(normalizedData);
+            }
+        }
+        loadActiveRooms();
+    }, []);
 
 
+    //TangalDisabler
     const isDateDisabledForActive = (roomNumber, date) => {
         const formattedDate = date.toISOString().split("T")[0];
         const roomActive = active.filter((act) => act.roomId === roomNumber);
@@ -75,69 +128,20 @@ export function CreateBlog() {
         return disabledDates;
     };
 
-    useEffect(() => {
-        async function loadActiveRooms() {
-            let data = await getActives();
-            if (data) {
-                data.forEach((active) => {
-                    active.checkin = new Date(active.checkin).toISOString().split("T")[0];
-                    active.checkout = new Date(active.checkout).toISOString().split("T")[0];
-                });
-                setActive(data);
-            }
-        }
-        loadActiveRooms();
-    }, []);
-
-
-
-    useEffect(() => {
-        async function loadKamar() {
-            let data = await getPosts();
-            if (data) {
-                // Normalisasi tanggal Checkin dan Checkout
-                data.forEach((room) => {
-                    room.Checkin = normalizeDate(room.Checkin);
-                    room.Checkout = normalizeDate(room.Checkout);
-                });
-                setRooms(data);
-            }
-        }
-        loadKamar();
-    }, []);
-
-    useEffect(() => {
-        async function loadActiveRooms() {
-            let data = await getActives();
-            if (data) {
-                const normalizedData = data.map((active) => ({
-                    ...active,
-                    checkin: normalizeDate(active.checkin),
-                    checkout: normalizeDate(active.checkout),
-                }));
-                setActive(normalizedData);
-            }
-        }
-        loadActiveRooms();
-    }, []);
-
+    //spinner
     const isSpinnerDisabled = (nomorKamar) => {
-        // Cari roomId berdasarkan NomorKamar
         const room = rooms.find((room) => room.NomorKamar === parseInt(nomorKamar, 10));
-        if (!room) return false; // Jika room tidak ditemukan, spinner tetap aktif
+        if (!room) return false;
 
-        const roomId = room.roomId; // Ambil roomId yang sesuai
+        const roomId = room.roomId;
         const checkInDate = dates[nomorKamar];
-        if (!checkInDate) return false; // Jika tidak ada tanggal check-in, spinner tetap aktif
+        if (!checkInDate) return false;
 
-        const spinnerDays = spinners[nomorKamar] || 1; // Default 1 hari jika spinner belum diatur
+        const spinnerDays = spinners[nomorKamar] || 1;
         const newCheckoutDate = calculateCheckoutDate(checkInDate, spinnerDays);
 
-        // Validasi apakah tanggal checkout bertabrakan
         const checkoutDateObj = new Date(newCheckoutDate);
         const disabledDates = getDisabledDatesForRoom(roomId);
-
-        // Periksa apakah tanggal checkout ada di dalam daftar tanggal yang dikecualikan
         return disabledDates.some(
             (disabledDate) =>
                 disabledDate.toISOString().split("T")[0] === checkoutDateObj.toISOString().split("T")[0]
@@ -178,25 +182,21 @@ export function CreateBlog() {
     };
 
     const handleSpinnerChange = (nomorKamar, value) => {
-        // Cari roomId berdasarkan nomor kamar
         const room = rooms.find((room) => room.NomorKamar === parseInt(nomorKamar, 10));
         if (!room) {
             alert("Room not found!");
             return;
         }
 
-        const roomId = room.roomId; // Dapatkan roomId
+        const roomId = room.roomId;
         const checkInDate = dates[nomorKamar];
         if (!checkInDate) {
             alert("Please select a check-in date first.");
             return;
         }
 
-        // Hitung tanggal checkout baru berdasarkan spinner value
         const newCheckoutDate = calculateCheckoutDate(checkInDate, value);
         const checkoutDateObj = new Date(newCheckoutDate);
-
-        // Filter active data untuk roomId yang sesuai
         const roomActiveDates = active
             .filter((act) => act.roomId === roomId)
             .map((act) => ({
@@ -204,7 +204,6 @@ export function CreateBlog() {
                 end: new Date(act.checkout),
             }));
 
-        // Periksa apakah tanggal checkout bertabrakan
         const isConflict = roomActiveDates.some(({ start, end }) =>
             checkoutDateObj >= start && checkoutDateObj <= end
         );
@@ -213,8 +212,6 @@ export function CreateBlog() {
             alert(`Tanggal checkout ${newCheckoutDate} bertabrakan dengan reservasi lain. Tidak dapat menambahkan durasi.`);
             return;
         }
-
-        // Perbarui spinner jika valid
         setSpinners((prevSpinners) => ({
             ...prevSpinners,
             [nomorKamar]: value,
@@ -223,18 +220,16 @@ export function CreateBlog() {
         console.log(`Spinner untuk kamar ${nomorKamar} diperbarui ke: ${value}`);
     };
 
-
-
     const calculateCheckoutDate = (checkInDate, daysToAdd) => {
-        const date = new Date(checkInDate); // Buat salinan tanggal
-        date.setDate(date.getDate() + daysToAdd); // Tambahkan hari
-        return date.toISOString().split("T")[0]; // Format YYYY-MM-DD
+        const date = new Date(checkInDate);
+        date.setDate(date.getDate() + daysToAdd);
+        return date.toISOString().split("T")[0];
     };
 
 
     const handleCheckboxChange = (event) => {
         const { value, checked } = event.target;
-        const intValue = parseInt(value, 10); // Konversi ke integer
+        const intValue = parseInt(value, 10);
 
         if (checked) {
             if (!selectedRooms.includes(value)) {
@@ -303,7 +298,7 @@ export function CreateBlog() {
     // };
 
 
-
+    //SUBMITTT
     const submitReservation = async () => {
         if (!decodedUser?._id) {
             return;
@@ -314,13 +309,13 @@ export function CreateBlog() {
         }
 
         for (const roomNumber of selectedRooms) {
-            const checkInDate = dates[roomNumber]; // Ambil check-in dari state dates
+            const checkInDate = dates[roomNumber];
             const spinnerDays = spinners[roomNumber] || 1;
             const checkOutDate = calculateCheckoutDate(checkInDate, spinnerDays);
 
             const newActiveHotel = {
                 userId: decodedUser._id,
-                roomId: parseInt(roomNumber, 10), // Konversi ke integer
+                roomId: parseInt(roomNumber, 10),
                 checkin: checkInDate,
                 checkout: checkOutDate,
             };
@@ -332,92 +327,109 @@ export function CreateBlog() {
         }
 
         alert("Reservasi berhasil dibuat!");
-        setSelectedRooms([]); // Reset kamar yang dipilih
-        setDates({}); // Reset tanggal
-        setSpinners({}); // Reset spinner
+        setSelectedRooms([]);
+        setDates({});
+        setSpinners({});
+        window.location.reload()
     };
 
 
-    const [currentIndex, setCurrentIndex] = useState(0);
-
-    const slides = [
-        Hotel1,
-        Hotel2,
-    ];
-
+    //CARAUSELLLL
     const handleNext = () => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
+        setCurrentIndex((prevIndex) => {
+            const nextIndex = (prevIndex + 1) % 2;
+            updateClasses(nextIndex + 1);
+            return nextIndex;
+        });
     };
 
     const handlePrev = () => {
-        setCurrentIndex((prevIndex) =>
-            prevIndex === 0 ? slides.length - 1 : prevIndex - 1
-        );
+        setCurrentIndex((prevIndex) => {
+            const prevIndexValue = prevIndex === 0 ? 1 : prevIndex - 1;
+            updateClasses(prevIndexValue + 1);
+            return prevIndexValue;
+        });
     };
 
-    const [reserve, setreserve] = useState(false)
-    const reservasi = () => {
-        setreserve(false)
-    }
+    const updateClasses = (activeGroup) => {
+        const allRooms = document.querySelectorAll('[class^="kamar-"]');
 
+        allRooms.forEach((el) => {
+            const currentClass = Array.from(el.classList).find((cls) =>
+                cls.startsWith("kamar-")
+            );
+
+            if (currentClass) {
+                el.classList.remove(currentClass);
+            }
+            const roomNumber = currentClass.split("-")[1];
+            el.classList.add(`kamar-${roomNumber}-hidden`);
+        });
+        const start = activeGroup === 1 ? 1 : 13;
+        const end = activeGroup === 1 ? 12 : 24;
+
+        for (let i = start; i <= end; i++) {
+            const element = document.querySelector(`.kamar-${i}-hidden`);
+            if (element) {
+                element.classList.remove(`kamar-${i}-hidden`);
+                element.classList.add(`kamar-${i}`);
+            }
+        }
+    };
+
+
+
+    //Tanggalan
     const handleDateChange = (nomorKamar, date) => {
         if (!date) return;
-    
+
         const room = rooms.find((room) => room.NomorKamar === parseInt(nomorKamar, 10));
         if (!room) {
             alert("Room not found!");
             return;
         }
-    
-        const roomId = room.roomId; // Dapatkan roomId
+
+        const roomId = room.roomId;
         const formattedDate = date.toISOString().split("T")[0];
-    
-        // Filter active data berdasarkan roomId
         const roomActiveDates = active
             .filter((act) => act.roomId === roomId)
             .map((act) => ({
                 start: new Date(act.checkin),
                 end: new Date(act.checkout),
             }));
-    
-        // Validasi apakah tanggal check-in bertabrakan
+
         const isConflict = roomActiveDates.some(({ start, end }) =>
             date >= start && date <= end
         );
-    
+
         if (isConflict) {
             alert("Tanggal yang dipilih sudah dipesan. Silakan pilih tanggal lain.");
             return;
         }
-    
+
         setDates((prevDates) => ({
             ...prevDates,
             [nomorKamar]: formattedDate,
         }));
-    
-        // Reset spinner ke 1 untuk kamar tersebut
+
         setSpinners((prevSpinners) => ({
             ...prevSpinners,
             [nomorKamar]: 1,
         }));
-    
+
         console.log(`Tanggal untuk kamar ${nomorKamar} diubah ke: ${formattedDate}`);
     };
-    
-
 
     const getDefaultDate = (nomorKamar) => {
         const room = rooms.find((room) => room.NomorKamar === parseInt(nomorKamar, 10));
         if (!room) {
             console.error("Room not found!");
-            return new Date(); // Default ke hari ini jika room tidak ditemukan
+            return new Date();
         }
 
-        const roomId = room.roomId; // Dapatkan roomId
+        const roomId = room.roomId;
         let today = new Date();
         let nextValidDate = new Date(today);
-
-        // Ambil daftar tanggal yang dikecualikan berdasarkan roomId
         const excludedDates = active
             .filter((act) => act.roomId === roomId)
             .flatMap((act) => {
@@ -431,7 +443,6 @@ export function CreateBlog() {
                 return dates;
             });
 
-        // Cari tanggal valid berikutnya
         while (
             excludedDates.some(
                 (excludedDate) =>
@@ -446,23 +457,58 @@ export function CreateBlog() {
         return nextValidDate;
     };
 
-
-
-
-
     const normalizeDate = (dateString) => {
         const date = new Date(dateString);
-        return new Date(date.getFullYear(), date.getMonth(), date.getDate()); // Set waktu ke 00:00:00
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
     };
 
+    useEffect(() => {
+        async function clearExpiredActive() {
+            try {
+                const today = new Date();
+                const expiredActives = active.filter((act) => {
+                    const checkoutDate = new Date(act.checkout);
+                    return checkoutDate < today;
+                });
 
+                for (const expired of expiredActives) {
+                    await deleteActive(expired.id);
+                    console.log(`Active ID ${expired.id} dihapus dan sudah leaawt boloo.`);
+                }
+                const refreshedData = await getActives();
+                if (refreshedData) {
+                    const normalizedData = refreshedData.map((active) => ({
+                        ...active,
+                        checkin: normalizeDate(active.checkin),
+                        checkout: normalizeDate(active.checkout),
+                    }));
+                    setActive(normalizedData);
+                }
+            } catch (error) {
+                console.error("kedaluwarsa bolo :", error);
+            }
+        }
+        clearExpiredActive();
+    }, [active]);
 
+    const startserve = () => {
+        setreserve(true)
+        setTimeout(() => {
+
+            for (let i = 13; i <= 24; i++) {
+                const element = document.querySelector(`.kamar-${i}`);
+                if (element) {
+                    element.classList.remove(`kamar-${i}`);
+                    element.classList.add(`kamar-${i}-hidden`);
+                }
+            }
+        }, 1);
+    }
 
     return (
-
         <>
             <p></p>
-            <button onClick={() => setreserve(true)}>
+            <button onClick={startserve} className='reserve'>
                 Reserve Now !!!
             </button>
             {reserve && (
@@ -471,109 +517,116 @@ export function CreateBlog() {
 
                     <div className="IsiKotakLogin">
                         <form className="Submit-Reservasi" >
-                            <div className="carousel">
-                                <div
-                                    className="carousel-container"
-                                    style={{
-                                        transform: `translateX(-${currentIndex * 100}%)`,
-                                    }}
-                                >
-                                    {slides.map((slide, slideIndex) => (
-                                        <div className="carousel-slide" key={slideIndex}>
-                                            <img src={slide} alt={`Slide ${slideIndex + 1}`} />
+                            <div className='crls'>
+                                <div className="carousel">
+                                    <div
+                                        className="carousel-container"
+                                        style={{
+                                            transform: `translateX(-${currentIndex * 100}%)`,
+                                        }}
+                                    >
+                                        {slides.map((slide, slideIndex) => (
+                                            <div className="carousel-slide" key={slideIndex}>
+                                                <img src={slide} alt={`Slide ${slideIndex + 1}`} />
 
-                                            <div className="checkbox-container">
-                                                {Array.from({ length: 10 }).map((_, checkboxIndex) => (
-                                                    <label key={`${slideIndex}-${checkboxIndex}`}>
-                                                        <input
-                                                            type="checkbox"
-                                                            id={`checkbox-${slideIndex}-${checkboxIndex}`}
-                                                            name={`checkbox-${slideIndex}-${checkboxIndex}`}
-                                                        />
-                                                        Option {checkboxIndex + 1}
-                                                    </label>
-                                                ))}
+                                                <div className="checkbox-container">
+                                                    {Array.from({ length: 10 }).map((_, checkboxIndex) => (
+                                                        <label key={`${slideIndex}-${checkboxIndex}`}>
+                                                            <input
+                                                                type="checkbox"
+                                                                id={`checkbox-${slideIndex}-${checkboxIndex}`}
+                                                                name={`checkbox-${slideIndex}-${checkboxIndex}`}
+                                                            />
+                                                            Option {checkboxIndex + 1}
+                                                        </label>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
-                                <button className="carousel-btn prev" onClick={handlePrev}>
-                                    ❮
-                                </button>
-                                <button className="carousel-btn next" onClick={handleNext}>
-                                    ❯
-                                </button>
-                                <div className="carousel-indicators">
-                                    {slides.map((_, index) => (
-                                        <span
-                                            key={index}
-                                            className={`indicator ${currentIndex === index ? "active" : ""
-                                                }`}
-                                            onClick={() => setCurrentIndex(index)}
-                                        ></span>
-                                    ))}
+                                        ))}
+                                    </div>
+                                    <button className="carousel-btn prev" onClick={handlePrev}>
+                                        ❮
+                                    </button>
+                                    <button className="carousel-btn next" onClick={handleNext}>
+                                        ❯
+                                    </button>
+                                    <div className="carousel-indicators">
+                                        {slides.map((_, index) => (
+                                            <span
+                                                key={index}
+                                                className={`indicator ${currentIndex === index ? "active" : ""
+                                                    }`}
+                                                onClick={() => setCurrentIndex(index)}
+                                            ></span>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
+
                             <div className='Formreservasi'>
                                 {/* //Logikaa */}
-                                <h1>Kamar</h1>
                                 {rooms.map((room) => (
-                                    <div key={room?.NomorKamar} className={`kamar-${room?.NomorKamar}`}>
-                                        <label>
-                                            <input
-                                                type="checkbox"
-                                                value={room?.NomorKamar}
-                                                onChange={handleCheckboxChange}
-                                            />
-                                            {room?.NomorKamar}
-                                        </label>
-                                        {selectedRooms.includes(`${room?.NomorKamar}`) && (
-                                            <>
-                                                <DatePicker
-                                                    selected={
-                                                        dates[room?.NomorKamar]
-                                                            ? new Date(dates[room?.NomorKamar])
-                                                            : getDefaultDate(room?.NomorKamar)
-                                                    }
-                                                    // selected={getDefaultDate(room?.NomorKamar)}
-                                                    minDate={new Date()}
-                                                    excludeDates={getDisabledDatesForRoom(room?.NomorKamar)}
-
-                                                    onChange={(date) => handleDateChange(room?.NomorKamar, date)}
-                                                />
-
+                                    <div id="allkamar" key={room?.NomorKamar} style={{ position: "relative" }} className={`kamar-${room?.NomorKamar}`}>
+                                        <div>
+                                            <label className='customlabel'>
                                                 <input
-                                                    type="number"
-                                                    value={spinners[room?.NomorKamar] || 1}
-                                                    min={1}
-                                                    max={getMaxSpinner(room?.NomorKamar)} // Atur batas maksimal spinner
-                                                    onChange={(e) =>
-                                                        handleSpinnerChange(
-                                                            room?.NomorKamar,
-                                                            parseInt(e.target.value, 10)
-                                                        )
-                                                    }
+                                                    type="checkbox"
+                                                    className="custom-checkbox"
+                                                    value={room?.NomorKamar}
+                                                    onChange={handleCheckboxChange}
                                                 />
+                                                <div className="angkakamar">{room?.NomorKamar}</div>
+                                            </label>
+                                        </div>
 
-                                                <p>
-                                                    Checkout:{" "}
-                                                    {dates[room?.NomorKamar]
-                                                        ? calculateCheckoutDate(
-                                                            dates[room?.NomorKamar],
-                                                            spinners[room?.NomorKamar] || 1
-                                                        )
-                                                        : "Pilih Check-in"}
-                                                </p>
-                                            </>
-                                        )}
+                                        <div
+                                            className={`dynamic-content ${selectedRooms.includes(`${room?.NomorKamar}`) ? "visible" : ""
+                                                }`}
+                                        >
+                                            <DatePicker
+                                                selected={
+                                                    dates[room?.NomorKamar]
+                                                        ? new Date(dates[room?.NomorKamar])
+                                                        : getDefaultDate(room?.NomorKamar)
+                                                }
+                                                minDate={new Date()}
+                                                excludeDates={getDisabledDatesForRoom(room?.NomorKamar)}
+                                                onChange={(date) => handleDateChange(room?.NomorKamar, date)}
+                                            />
+
+                                            <input
+                                                type="number"
+                                                value={spinners[room?.NomorKamar] || 1}
+                                                min={1}
+                                                max={getMaxSpinner(room?.NomorKamar)}
+                                                onChange={(e) =>
+                                                    handleSpinnerChange(
+                                                        room?.NomorKamar,
+                                                        parseInt(e.target.value, 10)
+                                                    )
+                                                }
+                                            />
+
+                                            <p>
+                                                Checkout:{" "}
+                                                {dates[room?.NomorKamar]
+                                                    ? calculateCheckoutDate(
+                                                        dates[room?.NomorKamar],
+                                                        spinners[room?.NomorKamar] || 1
+                                                    )
+                                                    : "Pilih Check-in"}
+                                            </p>
+                                        </div>
                                     </div>
                                 ))}
-                                {/* Logika */}
-                                <button onClick={submitReservation}>Submit</button>
-                            </div>
 
+
+                                {/* Logika */}
+
+                            </div>
+                            <button className='submitreservation' onClick={submitReservation}>Submit</button>
                             <div></div>
-                           
+
                         </form>
 
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" id="back" onClick={reservasi} className="outlogin">
@@ -591,6 +644,70 @@ export function CreateBlog() {
                 </div>
             )}
 
+            <div className='righth'>
+                <div className='hotelright'>
+                    <div className='hotelleft-img'>
+                        <img src={class1} width={650} alt="" />
+                    </div>
+                    <div className='hotelleft-caption'>
+                        <h1>
+                            Standard
+                        </h1>
+                        <p>
+                            "Our Standard Room provides a cozy and practical space for your stay. Equipped with comfortable bedding, a private bathroom, air conditioning, and complimentary Wi-Fi, it's perfect for solo travelers or couples looking for an affordable yet pleasant accommodation experience."
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div className='lefth'>
+                <div className='hotelleft'>
+                    <div className='hotelright-img'>
+                        <img src={class2} width={650} alt="" />
+                    </div>
+                    <div className='hotelleft-caption'>
+                        <h1>
+                            Superior
+                        </h1>
+                        <p>
+                            "Enjoy additional comfort in our Superior Room, offering more space and enhanced features. The room includes a plush bed, a seating area, a private bathroom with toiletries, and high-speed Wi-Fi, making it an excellent choice for a relaxing and comfortable stay."
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div className='righth'>
+                <div className='hotelright'>
+                    <div className='hotelleft-img'>
+                        <img src={class3} width={650} alt="" />
+                    </div>
+                    <div className='hotelleft-caption'>
+                        <h1>
+                            Deluxe
+                        </h1>
+                        <p>
+                            "Indulge in a blend of luxury and elegance in our Deluxe Room. Featuring sophisticated interiors, premium bedding, a flat-screen TV, a spacious bathroom, and complimentary refreshments, this room is designed to provide an unforgettable experience for leisure or business travelers."
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div className='lefth'>
+                <div className='hotelleft'>
+                    <div className='hotelright-img'>
+                        <img src={class4} width={650} alt="" />
+                    </div>
+                    <div className='hotelleft-caption'>
+                        <h1>
+                            Executive
+                        </h1>
+                        <p>
+                            "Our Executive Room is the pinnacle of luxury and convenience. This spacious room offers exclusive amenities, including a king-sized bed, a work desk, a lounge area, and access to premium services. Ideal for business professionals and guests seeking a refined and upscale stay."
+                        </p>
+                    </div>
+                </div>
+            </div>
 
         </>
     )

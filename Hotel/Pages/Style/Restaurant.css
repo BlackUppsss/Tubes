@@ -1,0 +1,649 @@
+.KotakLogin {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    /* Efek blur */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 25;
+}
+
+.IsiKotakLogin {
+    position: fixed;
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    height: 700px;
+    width: 700px;
+    text-align: center;
+    z-index: 25;
+    background-color: rgb(230, 215, 213, 0.5);
+}
+
+.outlogin {
+    position: absolute;
+    background: transparent;
+    top: 5%;
+    left: 5%;
+    width: 30px;
+    border-radius: 6px;
+    text-align: center;
+    z-index: 26;
+    cursor: pointer;
+    font-size: large;
+    font-weight: 900;
+}
+
+
+.carousel::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    /* Lapisan gelap */
+    z-index: 2;
+    /* Pastikan overlay berada di atas gambar */
+    pointer-events: none;
+    /* Agar overlay tidak mengganggu interaksi */
+}
+
+.carousel {
+    position: relative;
+    max-width: 600px;
+    margin: auto;
+    overflow: hidden;
+    border-radius: 30%;
+    border: 5px solid #2f2a29;
+    display: flex;
+
+}
+
+.carousel:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.carousel-container {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slide {
+    position: relative;
+    /* Parent untuk posisi checkbox */
+    min-width: 100%;
+    height: 100%;
+}
+
+
+.carousel-slide label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+    z-index: 19;
+    position: absolute;
+    width: 300px;
+}
+
+.checkbox-container input[type="checkbox"] {
+    accent-color: #ff5733;
+    /* Warna centang */
+    transform: scale(1.2);
+    /* Perbesar ukuran checkbox */
+    cursor: pointer;
+    z-index: 4;
+    /* Pastikan di atas gambar */
+}
+
+
+.checkbox-container {
+    position: absolute;
+    /* Checkbox di atas gambar */
+    top: 10px;
+    /* Atur jarak dari atas */
+    left: 10px;
+    /* Atur jarak dari kiri */
+    z-index: 3;
+    /* Pastikan berada di atas gambar */
+    display: flex;
+    /* Jika ada beberapa checkbox */
+    flex-direction: column;
+    /* Susun checkbox secara vertikal */
+    gap: 10px;
+    /* Jarak antar checkbox */
+}
+
+
+
+.carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 2;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 2;
+    border-radius: 50%;
+    font-size: 18px;
+    user-select: none;
+}
+
+.carousel-btn.prev {
+    left: 10px;
+}
+
+.carousel-btn.next {
+    right: 10px;
+}
+
+.carousel-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.carousel-indicators {
+    position: absolute;
+    bottom: 10px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    gap: 8px;
+}
+
+.indicator {
+    width: 10px;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.indicator.active {
+    background-color: white;
+}
+
+.indicator:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.Submit-Reservasi {
+    display: flex;
+    color: #2f2a29;
+    font-weight: 500;
+    justify-content: center;
+}
+
+.Formreservasi {
+    width: 0%;
+}
+
+.angkakamar {
+    transform: translateX(-20px);
+    pointer-events: none;
+}
+
+#allkamar {
+    position: relative;
+    z-index: 20;
+}
+
+.custom-checkbox {
+    width: 20px;
+    height: 20px;
+    transform: scale(3.5);
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.customlabel {
+    display: flex;
+    align-items: center;
+
+}
+
+.angkakamar {
+    font-weight: 500;
+}
+
+.kamar-1 {
+    top: 75px;
+    left: -520px;
+    position: absolute
+}
+
+.kamar-2 {
+    left: -420px;
+    top: 50px;
+    position: absolute
+}
+
+.kamar-3 {
+    left: -310px;
+    top: 27px;
+    position: absolute
+}
+
+.kamar-4 {
+    left: -195px;
+    top: 5px;
+    position: absolute
+}
+
+.kamar-5 {
+    left: -88px;
+    top: -16px;
+    position: absolute
+}
+
+.kamar-6 {
+    left: -87px;
+    top: 65px;
+    position: absolute
+}
+
+.kamar-7 {
+    left: -420px;
+    top: 40px;
+    position: absolute
+}
+
+.kamar-8 {
+    left: -527px;
+    top: 16px;
+    position: absolute
+}
+
+.kamar-9 {
+    left: -527px;
+    top: 150px;
+    position: absolute
+}
+
+.kamar-10 {
+    left: -520px;
+    top: 260px;
+    position: absolute
+}
+
+.kamar-11 {
+    left: -195px;
+    top: 245px;
+    position: absolute
+}
+
+.kamar-12 {
+    left: -87px;
+    top: 170px;
+    position: absolute
+}
+
+.kamar-13 {
+    left: -500px;
+    bottom: 220px;
+    position: absolute
+}
+
+.kamar-14 {
+    left: -560px;
+    bottom: 120px;
+    position: absolute
+}
+
+.kamar-15 {
+    left: -467px;
+    bottom: 145px;
+    position: absolute
+}
+
+.kamar-16 {
+    left: -560px;
+    bottom: 30px;
+    position: absolute
+}
+
+.kamar-17 {
+    left: -550px;
+    bottom: -44px;
+    position: absolute
+}
+
+.kamar-18 {
+    left: -464px;
+    bottom: 15px;
+    position: absolute
+}
+
+.kamar-19 {
+    left: -464px;
+    bottom: -55px;
+    position: absolute
+}
+
+.kamar-20 {
+    left: -278px;
+    bottom: 103px;
+    position: absolute
+}
+
+.kamar-21 {
+    left: -150px;
+    bottom: 43px;
+    position: absolute
+}
+
+.kamar-22 {
+    left: -50px;
+    bottom: 103px;
+    position: absolute
+}
+
+.kamar-23 {
+    left: -50px;
+    bottom: 203px;
+    position: absolute
+}
+
+.kamar-24 {
+    left: -110px;
+    bottom: 480px;
+    position: absolute
+}
+
+.kamar-1-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    top: 75px;
+    left: -520px;
+    position: absolute
+}
+
+.kamar-2-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -420px;
+    top: 50px;
+    position: absolute
+}
+
+.kamar-3-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -310px;
+    top: 27px;
+    position: absolute
+}
+
+.kamar-4-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -195px;
+    top: 5px;
+    position: absolute
+}
+
+.kamar-5-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -88px;
+    top: -16px;
+    position: absolute
+}
+
+.kamar-6-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -87px;
+    top: 65px;
+    position: absolute
+}
+
+.kamar-7-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -420px;
+    top: 40px;
+    position: absolute
+}
+
+.kamar-8-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -527px;
+    top: 16px;
+    position: absolute
+}
+
+.kamar-9-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -527px;
+    top: 150px;
+    position: absolute
+}
+
+.kamar-10-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -520px;
+    top: 260px;
+    position: absolute
+}
+
+.kamar-11-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -195px;
+    top: 245px;
+    position: absolute
+}
+
+.kamar-12-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -87px;
+    top: 170px;
+    position: absolute
+}
+
+.kamar-13-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -500px;
+    bottom: 220px;
+    position: absolute
+}
+
+.kamar-14-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -560px;
+    bottom: 120px;
+    position: absolute
+}
+
+.kamar-15-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -467px;
+    bottom: 145px;
+    position: absolute
+}
+
+.kamar-16-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -560px;
+    bottom: 30px;
+    position: absolute
+}
+
+.kamar-17-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -550px;
+    bottom: -44px;
+    position: absolute
+}
+
+.kamar-18-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -464px;
+    bottom: 15px;
+    position: absolute
+}
+
+.kamar-19-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -464px;
+    bottom: -55px;
+    position: absolute
+}
+
+.kamar-20-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -278px;
+    bottom: 103px;
+    position: absolute
+}
+
+.kamar-21-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -150px;
+    bottom: 43px;
+    position: absolute
+}
+
+.kamar-22-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -50px;
+    bottom: 103px;
+    position: absolute
+}
+
+.kamar-23-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -50px;
+    bottom: 203px;
+    position: absolute
+    
+}
+
+.kamar-24-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    left: -110px;
+    bottom: 480px;
+    position: absolute
+    
+}
+
+.kamar-25 {
+    left: 190px;
+    position: absolute
+}
+
+.kamar-26 {
+    left: 170px;
+    position: absolute
+}
+
+
+
+
+.dynamic-content {
+    position: absolute;
+    top: 50px;
+    left: -90px;
+    z-index: 10;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.dynamic-content.visible {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+
+}
+
+.submitreservation {
+    position: absolute;
+    top: 640px;
+    width: 50px;
+    font-weight: 600;
+    transform: scale(2);
+    font-size: 10px;
+    font-family: "poppins", sans-serif;
+    border-color: #2f2a29;
+    border-radius: 5px;
+    border: solid;
+    cursor: pointer;
+}
+
+.submitreservation:hover {}
+
+.customlabel.hidden {
+    display: none;
+    pointer-events: none;
+}
+
+.dynamic-content.hidden {
+    display: none;
+    pointer-events: none;
+}
