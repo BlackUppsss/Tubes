@@ -19,7 +19,6 @@ import axios from 'axios'
 
 function App() {
   useEffect(() => {
-    // Mencegah zoom melalui gesture
     const preventZoom = (e) => {
       if (e.scale !== 1) {
         e.preventDefault();
@@ -29,7 +28,6 @@ function App() {
     document.addEventListener("gesturestart", preventZoom);
     document.addEventListener("gesturechange", preventZoom);
 
-    // Cleanup listener saat komponen di-unmount
     return () => {
       document.removeEventListener("gesturestart", preventZoom);
       document.removeEventListener("gesturechange", preventZoom);

@@ -159,18 +159,18 @@ export function Landing() {
     }, []);
 
     const downButtonRef = useRef(null);
-    const [isAnimating, setIsAnimating] = useState(false); // Status animasi (apakah sedang animasi atau tidak)
-    const lottieRef = useRef(null); // Menggunakan ref untuk mengontrol animasi secara langsung
+    const [isAnimating, setIsAnimating] = useState(false);
+    const lottieRef = useRef(null);
 
     useEffect(() => {
         if (isAnimating) {
             lottieRef.current.play();
         }
-    }, [isAnimating]); // Efek dijalankan setiap kali `isAnimating` berubah
+    }, [isAnimating]);
 
     const handleClick = () => {
-        if (!isAnimating) { // Jika animasi tidak sedang berjalan
-            setIsAnimating(true); // Aktifkan status animasi
+        if (!isAnimating) {
+            setIsAnimating(true);
         }
     };
 
@@ -235,15 +235,15 @@ export function Landing() {
                     <li className="slide-up">
                         <Player
                             ref={lottieRef}
-                            autoplay={false} // Jangan autoplay saat pertama kali dimuat
-                            loop={false}     // Tidak loop
-                            src={Arrow}  // Path ke file animasi Lottie
+                            autoplay={false}
+                            loop={false}
+                            src={Arrow}
                             style={{ height: '300px', width: 'auto' }}
                             onClick={handleClick}
                             play={isAnimating}
                             onEvent={(event) => {
                                 if (event === 'complete') {
-                                    setIsAnimating(false); // Reset status setelah selesai
+                                    setIsAnimating(false);
                                 }
                             }}
                             id='arrow'
@@ -252,9 +252,9 @@ export function Landing() {
                             position: "absolute",
                             top: 0,
                             left: 0,
-                            width: "100%", // Sesuai ukuran Player
-                            height: "100%", // Sesuai ukuran Player
-                            background: "transparent", // Buat tombol transparan agar Player terlihat
+                            width: "100%",
+                            height: "100%",
+                            background: "transparent",
                             border: "none",
                             cursor: isAnimating ? "not-allowed" : "pointer",
                             pointerEvents: isAnimating ? "none" : "auto",
